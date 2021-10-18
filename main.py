@@ -72,6 +72,8 @@ async def on_message(message):
   #Checking if user has role spell
   # dont do anything if not
   roles = message.author.roles
+  name = message.author.name
+  
   check = False
   for role in roles:
     if role.name == "spell":
@@ -82,11 +84,16 @@ async def on_message(message):
   #checking for punctuation
   tokenized = msg.split()
   for i,strr in enumerate(tokenized):
-    if strr[-1] == "?" or strr[-1] == "," or strr[-1] == "!" or strr[-1] == ".":
+    lastChar = strr[-1]
+    if lastChar == "?" or lastChar == "," or lastChar == "!" or lastChar == ".":
       tokenized[i] = strr[:-1]
+      
     x = re.search("<a:.+?:\d+>|<:.+?:\d+>", strr)
     if x:
       tokenized[i] = "match"
+
+    if(strr.startswith("@")): 
+       tokenized[i] = "tag"
 
     if len(strr) == 1:
       ascii = ord(strr)
@@ -96,17 +103,17 @@ async def on_message(message):
       
 
   misspelled = spell.unknown(tokenized)
+  text = name + ", "
   for word in misspelled:
     corrected = spell.correction(word)
-    text = ""
     if corrected == word:
-      text = word + " is misspelled. The word was spelled so poorly that no suggestions were found."
+      text += word + " is misspelled. The word was spelled so poorly that no suggestions were found.\n"
     else:
-      text = word + " is misspelled. I think you meant "+ spell.correction(word)
-    await message.channel.send(text)
+      text += word + " is misspelled. I think you meant "+ spell.correction(word) +"\n"
+    # await message.channel.send(text)
   if len(misspelled) > 0:
     random.randint(0,9)
-    await message.channel.send("Learn to spell, you " + first[random.randint(0,len(first)-1)] + " " +second[random.randint(0,len(second)-1)] + " "+ third[random.randint(0,len(third)-1)] + ".")
+    await message.channel.send(text + "Learn to spell, you " + first[random.randint(0,len(first)-1)] + " " +second[random.randint(0,len(second)-1)] + " "+ third[random.randint(0,len(third)-1)] + ".")
 
 
 keep_alive()
