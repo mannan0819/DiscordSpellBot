@@ -10,6 +10,7 @@ from replit import db
 
 # accepted_words = ["mannan", "LMAO"]
 # db["accepted_words"] = ["mannan", "LMAO"]
+# pip install pyspellchecker
 
 
 discord_key = os.environ['discordkey']
@@ -41,6 +42,9 @@ def callApi():
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
+  if "accepted_words" in db.keys():
+    accepted_words = db["accepted_words"]
+    spell.word_frequency.load_words(accepted_words)
   
 
 @client.event
@@ -91,12 +95,12 @@ async def on_message(message):
     x = re.search("<a:.+?:\d+>|<:.+?:\d+>", strr)
     if x:
       tokenized[i] = "match"
-
-    if(strr.startswith("@")): 
+    
+    if(tokenized[i].startswith("<@")):
        tokenized[i] = "tag"
 
-    if len(strr) == 1:
-      ascii = ord(strr)
+    if len(tokenized[i]) == 1:
+      ascii = ord(tokenized[i])
       if ascii < 0 or ascii > 140:
         tokenized[i] = "emote"
       # tokenized[i] = ""
